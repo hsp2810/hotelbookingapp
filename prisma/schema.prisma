@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstName         String
+  lastName          String
+  email             String   @unique
+  phone             String   @unique
+  password          String
+  customerFrom      DateTime @default(now()) @map("createdAt")
+  isCheckedIn       Boolean  @default(false)
+  currentBookedRoom Int?
+  isVIPMember       Boolean  @default(false)
+  previousStays     Stay[]
+  Room              Room[]
+}
+
+model Stay {
+  id                       String   @id @default(auto()) @map("_id") @db.ObjectId
+  user                     User     @relation(fields: [userId], references: [id])
+  room                     Room     @relation(fields: [roomId], references: [id])
+  checkedInTime            DateTime
+  checkedOutTime           DateTime
+  specialRequest           String?
+  isAirportShuttleIncluded Boolean  @default(false)
+  isBreakfastIncluded      Boolean  @default(false)
+  userId                   String   @db.ObjectId
+  roomId                   String   @db.ObjectId
+  totalStayBill            Float?   @default(0)
+}
+
+model Room {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  unitNumber     Int
+  roomKey        Int           @unique
+  category       RoomCategory? @relation(fields: [roomCategoryId], references: [id])
+  floor          Int
+  rent           Int
+  isBookedNow    Boolean?      @default(false)
+  bookedFrom     DateTime?
+  bookedTill     DateTime?
+  bookedBy       User?         @relation(fields: [userId], references: [id])
+  Stay           Stay[]
+  roomCategoryId String        @db.ObjectId
+  userId         String?       @db.ObjectId
+  features       String[]      @default([])
+}
+
+model RoomCategory {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String @unique
+  categoryUnit Int    @unique
+  floors       Int[]
+  priceStart   Int
+  priceEnd     Int
+  nOfRooms     Int?
+  Room         Room[]
+}
+
+model Admin {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String
+  password String
+}

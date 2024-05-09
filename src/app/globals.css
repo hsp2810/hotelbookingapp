@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Yellow Color: #FFCD00 */
+/* Violet Color: #361C70 */
+
+.bg-hotel {
+  background: url("/img/hotel-bg.jpg") center center/cover no-repeat;
+}
